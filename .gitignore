@@ -1,0 +1,50 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+.venv/
+venv.bak/
+
+# Flask / Django specific
+instance/
+*.log
+
+# Environment variables and credentials
+.env
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# pytest
+.cache/
+
+# coverage reports
+*.coveragerc
+.coverage
+*.hypothesis/
+.pytest_cache/
+
+# Flask / app config
+config.py
+*.db
+
+# SQLite database files
+*.sqlite3
+*.db
