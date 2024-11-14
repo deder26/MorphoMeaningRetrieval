@@ -6,3 +6,8 @@ flask-sqlalchemy
 flask-jwt-extended
 passlib
 flask-migrate
+sudachipy
+sudachidict_core
+sudachidict_full
+requests
+python-dotenv

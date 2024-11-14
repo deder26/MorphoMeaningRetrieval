@@ -1,9 +1,9 @@
-from db import db
 from flask.views import MethodView
+from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint, abort
-from passlib.hash import pbkdf2_sha256
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError
 
+from database import db
 from models import UserModel
 from schemas.userSchema import UserSchema
 
@@ -12,6 +12,7 @@ blp = Blueprint("user", __name__, description="Operations on user")
 
 @blp.route("/user/<string:id>")
 class User(MethodView):
+    @jwt_required()
     @blp.response(200, UserSchema)
     def get(self, id):
         try:
@@ -20,6 +21,7 @@ class User(MethodView):
         except Exception as e:
             abort(502, message="Error" + str(e))
 
+    @jwt_required()
     def delete(self, id):
         try:
             user = UserModel.query.get_or_404(id)
@@ -33,33 +35,16 @@ class User(MethodView):
 
 @blp.route("/users")
 class UsersList(MethodView):
+    @jwt_required()
     @blp.response(200, UserSchema(many=True))
     def get(self):
         users = UserModel.query.all()
         return users
 
 
-@blp.route("/user/create")
-class CreateUser(MethodView):
-    @blp.arguments(UserSchema)
-    @blp.response(200, UserSchema)
-    def post(self, requested_data):
-        try:
-            user = UserModel(**requested_data)
-            user.password = pbkdf2_sha256.hash(user.password)
-            db.session.add(user)
-            db.session.commit()
-            return user
-        except IntegrityError as IE:
-            abort(400, message="Error: " + str(IE))
-        except SQLAlchemyError as SQE:
-            abort(500, message="Error: " + str(SQE))
-        except Exception as ex:
-            abort(500, message="Error: " + str(ex))
-
-
 @blp.route("/user/update")
 class UpdateUser(MethodView):
+    @jwt_required()
     @blp.arguments(UserSchema)
     @blp.response(200, UserSchema)
     def put(self, request_data):
