@@ -2,7 +2,7 @@ from flask import jsonify
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
-from services.jishoDictionary import JishoService
+from services.jishoDictionaryApi import JishoService
 from services.sudachiTokenizer import MorphologicalAnalysis
 
 blp = Blueprint("morphoAnalysis", __name__, description="Morphological Operations")
@@ -25,7 +25,6 @@ class MorphoAnalysis(MethodView):
                 print("in")
                 dictionary = JishoService()
                 word_information = dictionary.getWordMeaning(word)
-                print(word_information)
                 if not word_information["success"]:
                     raise Exception(
                         f"Error while searching word meaning in dictionary {word_information['message']}"

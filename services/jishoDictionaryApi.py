@@ -18,7 +18,6 @@ class JishoService:
 
             if response.status_code == 200:
                 res = response.json()
-                print(res["data"][0])
                 # Check if there are results
                 if res["data"][0]:
                     data = res["data"][0]
@@ -48,5 +47,5 @@ class JishoService:
             return {"success": False, "message": str(e), "data": []}
 
 
-js = JishoService()
-print(js.getWordMeaning("車"))
+# js = JishoService()
+# print(js.getWordMeaning("車"))
