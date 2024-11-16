@@ -1,3 +1,4 @@
+import sys
 from typing import Dict, List, Union
 
 from sudachipy import dictionary, tokenizer
@@ -26,6 +27,9 @@ class MorphologicalAnalysis:
             return {"success": True, "message": "", "words": words}
 
         except Exception as e:
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            line_number = exc_tb.tb_lineno
+            print(f"sudachi: {str(e)} as line {line_number}")
             return {"success": False, "message": str(e), "words": []}
 
 

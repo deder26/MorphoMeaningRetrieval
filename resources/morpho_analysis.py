@@ -1,6 +1,8 @@
+import sys
+
 from flask import jsonify
 from flask.views import MethodView
-from flask_smorest import Blueprint, abort
+from flask_smorest import Blueprint
 
 from services.jishoDictionaryApi import JishoService
 from services.sudachiTokenizer import MorphologicalAnalysis
@@ -21,18 +23,24 @@ class MorphoAnalysis(MethodView):
                 )
             res = []
             words = morphos["words"]
+
             for word in words:
-                print("in")
                 dictionary = JishoService()
                 word_information = dictionary.getWordMeaning(word)
                 if not word_information["success"]:
                     raise Exception(
                         f"Error while searching word meaning in dictionary {word_information['message']}"
                     )
+
                 res.append(
                     {
                         "word": word,
-                        "meaning": word_information["data"]["meaning"],
+                        "meaning": word_information["data"]["meaning"]
+                        if word_information["data"]
+                        else "No meaning found",
+                        "japanese_reading": word_information["data"]
+                        if word_information["data"]
+                        else [],
                     }
                 )
             return jsonify(
@@ -43,7 +51,9 @@ class MorphoAnalysis(MethodView):
                 }
             ), 200
         except Exception as e:
-            abort(500, message=str(e))
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            line_number = exc_tb.tb_lineno
+            print(f"anlysis: {str(e)} as line {line_number}")
             return jsonify({"success": False, "message": str(e), "data": []}), 500
 
 

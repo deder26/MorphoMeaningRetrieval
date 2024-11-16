@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import Dict, Union
 
 import requests
@@ -19,7 +20,7 @@ class JishoService:
             if response.status_code == 200:
                 res = response.json()
                 # Check if there are results
-                if res["data"][0]:
+                if res["data"]:
                     data = res["data"][0]
                     japanese_reading = (
                         data["japanese"][0]["reading"]
@@ -40,11 +41,16 @@ class JishoService:
                         },
                     }
                 else:
-                    return {"success": True, "message": "No Data Found", "data": []}
+                    print("No Data Found")
+                    return {"success": True, "message": "No Data Found", "data": {}}
             else:
-                return {"success": False, "message": "Unable to Fetch Data", "data": []}
-        except requests.exceptions.RequestException as e:
-            return {"success": False, "message": str(e), "data": []}
+                print("Unable to Fetch Data")
+                return {"success": False, "message": "Unable to Fetch Data", "data": {}}
+        except Exception as e:
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            line_number = exc_tb.tb_lineno
+            print(f"jisho: {str(e)} as line {line_number}")
+            return {"success": False, "message": str(e), "data": {}}
 
 
 # js = JishoService()
