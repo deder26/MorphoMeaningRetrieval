@@ -31,18 +31,18 @@ class MorphoAnalysis(MethodView):
                     raise Exception(
                         f"Error while searching word meaning in dictionary {word_information['message']}"
                     )
-
                 res.append(
                     {
                         "word": word,
                         "meaning": word_information["data"]["meaning"]
                         if word_information["data"]
                         else "No meaning found",
-                        "japanese_reading": word_information["data"]
+                        "japanese_reading": word_information["data"]["japanese_reading"]
                         if word_information["data"]
-                        else [],
+                        else "",
                     }
                 )
+
             return jsonify(
                 {
                     "success": True,
