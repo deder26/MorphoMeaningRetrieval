@@ -19,8 +19,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.PYTHONANYWHERE_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts  # Trust PythonAnywhere's SSH host
-
+          ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts
+          echo "Host ssh.pythonanywhere.com" >> ~/.ssh/config
+          echo "  HostkeyAlgorithms +ssh-rsa" >> ~/.ssh/config  # Allow ssh-rsa algorithm
+          echo "  PubkeyAcceptedKeyTypes +ssh-rsa" >> ~/.ssh/config  # Accept ssh-rsa key type
       - name: Deploy to PythonAnywhere
         uses: appleboy/ssh-action@v0.1.2
         with:
