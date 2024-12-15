@@ -1,0 +1,25 @@
+name: Deploy to PythonAnywhere
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-development:
+    if: github.ref == 'refs/heads/main'  # Only run for the main branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to PythonAnyWhere Environment
+        env:
+          PYTHONANYWHERE_API_TOKEN: ${{ secrets.PYTHONANYWHERE_DEV_API_TOKEN }}
+          PYTHONANYWHERE_USERNAME: ${{ secrets.PYTHONANYWHERE_DEV_USERNAME }}
+        run: |
+          ssh $PYTHONANYWHERE_USERNAME@ssh.pythonanywhere.com <<EOF
+          cd /home/$PYTHONANYWHERE_USERNAME/mysite
+          git pull origin development
+          pa_reload_webapp.py $PYTHONANYWHERE_USERNAME.pythonanywhere.com
+          EOF
