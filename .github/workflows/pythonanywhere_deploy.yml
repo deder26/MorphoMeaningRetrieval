@@ -19,7 +19,7 @@ jobs:
           PYTHONANYWHERE_USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
         run: |
           echo $PYTHONANYWHERE_USERNAME;
-          ssh $PYTHONANYWHERE_USERNAME@ssh.pythonanywhere.com <<EOF
+          ssh -o StrictHostKeyChecking=no $PYTHONANYWHERE_USERNAME@ssh.pythonanywhere.com <<EOF
           cd /home/$PYTHONANYWHERE_USERNAME/mysite
           git pull origin development
           pa_reload_webapp.py $PYTHONANYWHERE_USERNAME.pythonanywhere.com
