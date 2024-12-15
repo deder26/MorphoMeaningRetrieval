@@ -9,19 +9,25 @@ jobs:
   deploy-development:
     if: github.ref == 'refs/heads/main'  # Only run for the main branch
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Connect to PythonAnywhere
-        uses: actions/ssh@v3
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PYTHONANYWHERE_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts  # Trust PythonAnywhere's SSH host
+
+      - name: Deploy to PythonAnywhere
+        uses: appleboy/ssh-action@v0.1.2
         with:
           host: ssh.pythonanywhere.com
           username: ${{ secrets.PYTHONANYWHERE_USERNAME }}
-          private-key: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}  
-
-      - name: Deploy Code (within the server)
-        run: |
-          cd /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/mysite
-          git pull origin main
-          pa_reload_webapp.py ${{ secrets.PYTHONANYWHERE_USERNAME }}.pythonanywhere.com
+          key: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/mysite
+            git pull origin main
+            pa_reload_webapp.py ${{ secrets.PYTHONANYWHERE_USERNAME }}.pythonanywhere.com
