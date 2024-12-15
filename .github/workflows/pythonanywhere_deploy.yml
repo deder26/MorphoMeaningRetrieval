@@ -23,5 +23,5 @@ jobs:
       - name: Deploy Code (within the server)
         run: |
           cd /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/mysite
-          git pull origin development
+          git pull origin main
           pa_reload_webapp.py ${{ secrets.PYTHONANYWHERE_USERNAME }}.pythonanywhere.com
