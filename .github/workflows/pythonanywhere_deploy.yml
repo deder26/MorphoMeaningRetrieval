@@ -14,15 +14,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH key
+      - name: Set up SSH key and config
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.PYTHONANYWHERE_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts
+          # Allow the rsa-sha2 algorithms PythonAnywhere supports
           echo "Host ssh.pythonanywhere.com" >> ~/.ssh/config
-          echo "  HostkeyAlgorithms +ssh-rsa" >> ~/.ssh/config  # Allow ssh-rsa algorithm
-          echo "  PubkeyAcceptedKeyTypes +ssh-rsa" >> ~/.ssh/config  # Accept ssh-rsa key type
+          echo "  HostkeyAlgorithms +rsa-sha2-512,rsa-sha2-256" >> ~/.ssh/config  # Allow rsa-sha2-512 and rsa-sha2-256 algorithms
+          echo "  PubkeyAcceptedKeyTypes +rsa-sha2-512,rsa-sha2-256" >> ~/.ssh/config  # Accept rsa-sha2-512 and rsa-sha2-256 key types
+
       - name: Deploy to PythonAnywhere
         uses: appleboy/ssh-action@v0.1.2
         with:
