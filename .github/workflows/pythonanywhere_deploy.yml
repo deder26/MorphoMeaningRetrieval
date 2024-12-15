@@ -13,14 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to PythonAnyWhere Environment
-        env:
-          PYTHONANYWHERE_API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
-          PYTHONANYWHERE_USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+      - name: Connect to PythonAnywhere
+        run: ssh ${{ secrets.PYTHONANYWHERE_USERNAME }}@ssh.pythonanywhere.com
+
+      - name: Deploy Code (within the server)
         run: |
-          ssh $PYTHONANYWHERE_USERNAME@ssh.pythonanywhere.com <<EOF
-          echo "$PYTHONANYWHERE_USERNAME"
-          cd /home/$PYTHONANYWHERE_USERNAME/mysite
+          cd /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/mysite
           git pull origin development
-          pa_reload_webapp.py $PYTHONANYWHERE_USERNAME.pythonanywhere.com
-          EOF
+          pa_reload_webapp.py ${{ secrets.PYTHONANYWHERE_USERNAME }}.pythonanywhere.com
