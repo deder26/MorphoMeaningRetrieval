@@ -27,12 +27,17 @@ jobs:
         PA_API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
         PA_USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
       run: |
-        # Upload files to PythonAnywhere
+        # Compress the app
         tar --warning=no-file-changed -czf app.tar.gz .
-        curl -X POST -H "Authorization: Token $PA_API_TOKEN" \
+
+        # Debug: List files in tarball
+        tar -tf app.tar.gz
+
+        # Upload files to PythonAnywhere
+        curl -v -X POST -H "Authorization: Token $PA_API_TOKEN" \
           -F "file=@app.tar.gz" \
-          https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/files/home/$PA_USERNAME/mysite
+          https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/files/home/$PA_USERNAME/mysite/app.tar.gz
 
         # Reload the PythonAnywhere app
-        curl -X POST -H "Authorization: Token $PA_API_TOKEN" \
+        curl -v -X POST -H "Authorization: Token $PA_API_TOKEN" \
           https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/webapps/deder24.pythonanywhere.com/reload/
