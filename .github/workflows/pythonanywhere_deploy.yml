@@ -28,7 +28,7 @@ jobs:
         PA_USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
       run: |
         # Upload files to PythonAnywhere
-        tar -czf app.tar.gz .
+        tar --warning=no-file-changed -czf app.tar.gz .
         curl -X POST -H "Authorization: Token $PA_API_TOKEN" \
           -F "file=@app.tar.gz" \
           https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/files/home/$PA_USERNAME/mysite
