@@ -6,32 +6,34 @@ on:
       - main
 
 jobs:
-  deploy-development:
-    if: github.ref == 'refs/heads/main'  # Only run for the main branch
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up SSH key and config
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.PYTHONANYWHERE_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts
-          # Allow the rsa-sha2 algorithms PythonAnywhere supports
-          echo "Host ssh.pythonanywhere.com" >> ~/.ssh/config
-          echo "  HostkeyAlgorithms +rsa-sha2-512,rsa-sha2-256" >> ~/.ssh/config  # Allow rsa-sha2-512 and rsa-sha2-256 algorithms
-          echo "  PubkeyAcceptedKeyTypes +rsa-sha2-512,rsa-sha2-256" >> ~/.ssh/config  # Accept rsa-sha2-512 and rsa-sha2-256 key types
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-      - name: Deploy to PythonAnywhere
-        uses: appleboy/ssh-action@v0.1.2
-        with:
-          host: ssh.pythonanywhere.com
-          username: ${{ secrets.PYTHONANYWHERE_USERNAME }}
-          key: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
-          script: |
-            cd /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/mysite
-            git pull origin main
-            pa_reload_webapp.py ${{ secrets.PYTHONANYWHERE_USERNAME }}.pythonanywhere.com
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Deploy to PythonAnywhere
+      env:
+        PA_API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
+        PA_USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+      run: |
+        # Upload files to PythonAnywhere
+        tar -czf app.tar.gz .
+        curl -X POST -H "Authorization: Token $PA_API_TOKEN" \
+          -F "file=@app.tar.gz" \
+          https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/files/path/to/your/app/
+
+        # Reload the PythonAnywhere app
+        curl -X POST -H "Authorization: Token $PA_API_TOKEN" \
+          https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/webapps/<your-app-name>/reload/
